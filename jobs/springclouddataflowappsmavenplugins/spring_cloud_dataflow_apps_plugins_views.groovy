@@ -14,17 +14,17 @@ dsl.listView('Seeds') {
     columns defaultColumns()
 }
 
-dsl.nestedView('SpringCloudAppStarterMavenPlugins') {
+dsl.nestedView('SpringCloudDataFlowAppsMavenPlugins') {
     views {
         listView('CI') {
             jobs {
-                regex('spring-cloud-app-starter.*-ci')
+                regex('spring-cloud-dataflow-apps-plugin.*-ci')
             }
             columns defaultColumns()
         }
-        listView('Spring Cloud App Starter Maven Plugin') {
+        listView('Spring Cloud Data Flow Apps Maven Plugin') {
             jobs {
-                regex('spring-cloud-app-starter.*')
+                regex('spring-cloud-dataflow-apps-plugin.*')
             }
             columns defaultColumns()
         }
