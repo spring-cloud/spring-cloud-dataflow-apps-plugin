@@ -1,4 +1,4 @@
-package org.springframework.jenkins.springcloudappstartermavenplugins.common
+package org.springframework.jenkins.springclouddataflowappsmavenplugins.ci.common
 
 import org.springframework.jenkins.common.job.BuildAndDeploy
 

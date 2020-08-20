@@ -1,7 +1,7 @@
-package org.springframework.jenkins.springcloudappstartermavenplugins.ci
+package org.springframework.jenkins.springclouddataflowappsmavenplugins.ci
 
 import org.springframework.jenkins.common.job.JdkConfig
-import org.springframework.jenkins.springcloudappstartermavenplugins.common.SpringCloudAppDataFlowAppsMavenPluginsJobs
+import org.springframework.jenkins.springclouddataflowappsmavenplugins.ci.common.SpringCloudAppDataFlowAppsMavenPluginsJobs
 import javaposse.jobdsl.dsl.DslFactory
 import org.springframework.jenkins.common.job.Cron
 import org.springframework.jenkins.common.job.Maven
@@ -17,7 +17,7 @@ class SpringCloudDataFlowAppsMavenPluginsBuildMaker implements JdkConfig, TestPu
     final String organization
     final String repo
 
-    String branchToBuild = "jenkins-build"
+    String branchToBuild = "master"
 
     Map<String, Object> envVariables = new HashMap<>();
 

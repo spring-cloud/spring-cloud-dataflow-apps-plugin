@@ -1,4 +1,4 @@
-package springcloudappstartermavenplugins
+package springclouddataflowappsmavenplugins
 
 import org.springframework.jenkins.common.view.DashboardViewBuilder
 import javaposse.jobdsl.dsl.DslFactory

@@ -1,6 +1,6 @@
-package springcloudappstartermavenplugins
+package springclouddataflowappsmavenplugins
 
-import org.springframework.jenkins.springcloudappstartermavenplugins.ci.SpringCloudDataFlowAppsMavenPluginsBuildMaker
+import org.springframework.jenkins.springclouddataflowappsmavenplugins.ci.SpringCloudDataFlowAppsMavenPluginsBuildMaker
 import javaposse.jobdsl.dsl.DslFactory
 
 DslFactory dsl = this
