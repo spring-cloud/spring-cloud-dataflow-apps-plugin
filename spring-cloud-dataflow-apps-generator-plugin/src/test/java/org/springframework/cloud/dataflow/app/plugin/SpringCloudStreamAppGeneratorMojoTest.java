@@ -39,7 +39,6 @@ import org.junit.rules.TemporaryFolder;
 import org.springframework.cloud.dataflow.app.plugin.generator.AppDefinition;
 import org.springframework.util.ReflectionUtils;
 
-import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
