@@ -227,7 +227,10 @@ public class SpringCloudStreamAppGeneratorMojo extends AbstractMojo {
 
 		app.getContainerImage().setTag(applicationVersion);
 
-		if (StringUtils.hasText(this.global.getApplication().getContainerImage().getBaseImage())) {
+		if (StringUtils.hasText(this.application.getContainerImage().getBaseImage())) {
+			app.getContainerImage().setBaseImage(this.application.getContainerImage().getBaseImage());
+		}
+		else if (StringUtils.hasText(this.global.getApplication().getContainerImage().getBaseImage())) {
 			app.getContainerImage().setBaseImage(this.global.getApplication().getContainerImage().getBaseImage());
 		}
 
