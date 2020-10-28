@@ -139,6 +139,22 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>{{app.springBootVersion}}</version>
+					<executions>
+						<execution>
+							<goals>
+								<goal>build-image</goal>
+							</goals>
+						</execution>
+					</executions>
+					<configuration>
+						<image>
+							<name>{{app.containerImage.orgName}}/${project.artifactId}:${project.version}-boot</name>
+						</image>
+						<layers>
+							<enabled>true</enabled>
+						</layers>
+					</configuration>
 			</plugin>
 
 			<plugin>
