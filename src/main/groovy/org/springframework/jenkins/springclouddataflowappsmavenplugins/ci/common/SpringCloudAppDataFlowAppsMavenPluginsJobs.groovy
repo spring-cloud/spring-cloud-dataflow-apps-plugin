@@ -16,7 +16,7 @@ trait SpringCloudAppDataFlowAppsMavenPluginsJobs extends BuildAndDeploy {
         return isGaRelease ?
                 """
                         rm -rf target
-                        lines=\$(find . -type f -name pom.xml | xargs egrep "SNAPSHOT|M[0-9]|RC[0-9]" | wc -l)
+                        lines=\$(find . -type f -name pom.xml | xargs egrep "SNAPSHOT|M[0-9]|RC[0-9]" | grep -v http-source-apps | wc -l)
                         if [ \$lines -eq 0 ]; then
                             set +x
                             ./mvnw clean deploy -Dgpg.secretKeyring="\$${gpgSecRing()}" -Dgpg.publicKeyring="\\\$${
