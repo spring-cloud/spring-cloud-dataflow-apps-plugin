@@ -15,13 +15,13 @@ trait SpringCloudAppDataFlowAppsMavenPluginsJobs extends BuildAndDeploy {
     String cleanAndDeploy(boolean isGaRelease) {
         return isGaRelease ?
                 """
-                        rm -rf target
+                        find . -type d -name "target" -exec rm -rf {} +
                         lines=\$(find . -type f -name pom.xml | xargs egrep "SNAPSHOT|M[0-9]|RC[0-9]" | grep -v http-source-apps | wc -l)
                         if [ \$lines -eq 0 ]; then
                             set +x
-                            ./mvnw clean deploy -Dgpg.secretKeyring="\$${gpgSecRing()}" -Dgpg.publicKeyring="\\\$${
+                            ./mvnw clean deploy -Dgpg.secretKeyring="\$${gpgSecRing()}" -Dgpg.publicKeyring="\$${
                     gpgPubRing()
-                }" -Dgpg.passphrase="\\\$${gpgPassphrase()}" -DSONATYPE_USER="\$${sonatypeUser()}" -DSONATYPE_PASSWORD="\$${sonatypePassword()}" -Pcentral -U
+                }" -Dgpg.passphrase="\$${gpgPassphrase()}" -DSONATYPE_USER="\$${sonatypeUser()}" -DSONATYPE_PASSWORD="\$${sonatypePassword()}" -Pcentral -U
                             set -x
                         else
                             echo "Non release versions found. Aborting build"
