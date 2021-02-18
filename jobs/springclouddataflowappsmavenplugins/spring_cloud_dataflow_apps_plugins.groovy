@@ -5,6 +5,6 @@ import javaposse.jobdsl.dsl.DslFactory
 
 DslFactory dsl = this
 
-// CI
-new SpringCloudDataFlowAppsMavenPluginsBuildMaker(dsl, "spring-cloud", "spring-cloud-dataflow-apps-plugin").deploy()
+// CI. Toggle second parameter on the call to deploy with true/false to enable/disable GA release
+new SpringCloudDataFlowAppsMavenPluginsBuildMaker(dsl, "spring-cloud", "spring-cloud-dataflow-apps-plugin").deploy(false, true)
 
