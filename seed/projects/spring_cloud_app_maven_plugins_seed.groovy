@@ -7,7 +7,7 @@ job('spring-cloud-app-maven-plugins-seed') {
             remote {
                 github('spring-cloud/spring-cloud-dataflow-apps-plugin')
             }
-            branch('master')
+            branch('main')
         }
     }
     steps {

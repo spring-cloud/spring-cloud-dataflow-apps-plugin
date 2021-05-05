@@ -17,7 +17,7 @@ class SpringCloudDataFlowAppsMavenPluginsBuildMaker implements JdkConfig, TestPu
     final String organization
     final String repo
 
-    String branchToBuild = "master"
+    String branchToBuild = "main"
 
     Map<String, Object> envVariables = new HashMap<>();
 
