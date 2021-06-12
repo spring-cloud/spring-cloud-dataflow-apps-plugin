@@ -52,6 +52,11 @@ public class AppDefinition {
 	private String configClass;
 
 	/**
+	 * Application's package root.
+	 */
+	private String packageRoot;
+
+	/**
 	 * Spring Cloud Function defintion.
 	 */
 	private String functionDefinition;
@@ -146,6 +151,14 @@ public class AppDefinition {
 
 	public void setConfigClass(String configClass) {
 		this.configClass = configClass;
+	}
+
+	public String getPackageRoot() {
+		return packageRoot;
+	}
+
+	public void setPackageRoot(String packageRoot) {
+		this.packageRoot = packageRoot;
 	}
 
 	public String getFunctionDefinition() {
