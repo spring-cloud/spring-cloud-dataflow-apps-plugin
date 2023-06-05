@@ -40,10 +40,17 @@ class SpringCloudDataFlowAppsMavenPluginsBuildMaker implements JdkConfig, TestPu
                 colorizeOutput()
                 environmentVariables(envVariables)
                 credentialsBinding {
-                    file('FOO_SEC', "spring-signing-secring.gpg")
-                    file('FOO_PUB', "spring-signing-pubring.gpg")
-                    string('FOO_PASSPHRASE', "spring-gpg-passphrase")
-                    usernamePassword('SONATYPE_USER', 'SONATYPE_PASSWORD', "oss-token")
+                    usernamePassword(buildUserNameEnvVar(),
+                            buildPasswordEnvVar(),
+                            buildCredentialId())
+                }
+                if (isGaRelease) {
+                        credentialsBinding {
+                            file('FOO_SEC', "spring-signing-secring.gpg")
+                            file('FOO_PUB', "spring-signing-pubring.gpg")
+                            string('FOO_PASSPHRASE', "spring-gpg-passphrase")
+                            usernamePassword('SONATYPE_USER', 'SONATYPE_PASSWORD', "oss-token")
+                        }
                 }
             }
             scm {
