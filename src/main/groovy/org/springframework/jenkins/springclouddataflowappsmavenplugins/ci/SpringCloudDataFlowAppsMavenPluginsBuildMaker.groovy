@@ -35,7 +35,7 @@ class SpringCloudDataFlowAppsMavenPluginsBuildMaker implements JdkConfig, TestPu
                     githubPush()
                 }
             }
-            jdk jdk8()
+            jdk jdk17()
             wrappers {
                 colorizeOutput()
                 environmentVariables(envVariables)
