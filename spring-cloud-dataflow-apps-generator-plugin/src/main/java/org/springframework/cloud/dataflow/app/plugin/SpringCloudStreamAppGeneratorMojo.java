@@ -80,63 +80,76 @@ public class SpringCloudStreamAppGeneratorMojo extends AbstractMojo {
 	@Parameter
 	private Map<String, Binder> binders = new HashMap<>();
 
+	private static boolean isEmpty(String text) {
+		return !StringUtils.hasText(text);
+	}
+
 	@Override
 	public void execute() throws MojoFailureException, MojoExecutionException {
 
 		// ----------------------------------------------------------------------------------------------------------
-		//                               Application Configuration
+		// Application Configuration
 		// ----------------------------------------------------------------------------------------------------------
 
 		AppDefinition app = new AppDefinition();
 
-		String bootVersion = StringUtils.isEmpty(this.application.getBootVersion()) ?
-				this.global.getApplication().getBootVersion() : this.application.getBootVersion();
-		if (StringUtils.isEmpty(bootVersion)) {
+		String bootVersion = isEmpty(this.application.getBootVersion()) ? this.global.getApplication().getBootVersion()
+				: this.application.getBootVersion();
+		if (isEmpty(bootVersion)) {
 			throw new MojoExecutionException("The application.bootVersion parameter is required!");
 		}
 		app.setSpringBootVersion(bootVersion);
 
-		String applicationName = StringUtils.isEmpty(this.application.getName()) ?
-				this.global.getApplication().getName() : this.application.getName();
-		if (StringUtils.isEmpty(applicationName)) {
+		String applicationName = isEmpty(this.application.getName()) ? this.global.getApplication().getName()
+				: this.application.getName();
+		if (isEmpty(applicationName)) {
 			throw new MojoExecutionException("The application.name parameter is required!");
 		}
 		app.setName(applicationName);
 
-		AppDefinition.AppType applicationType = (this.application.getType() == null) ?
-				this.global.getApplication().getType() : this.application.getType();
+		AppDefinition.AppType applicationType = (this.application.getType() == null)
+				? this.global.getApplication().getType()
+				: this.application.getType();
 		if (applicationType == null) {
 			throw new MojoExecutionException("The application.type parameter is required!");
 		}
 		app.setType(applicationType);
 
-		String applicationVersion = StringUtils.isEmpty(this.application.getVersion()) ?
-				this.global.getApplication().getVersion() : this.application.getVersion();
-		if (StringUtils.isEmpty(applicationVersion)) {
+		String applicationVersion = isEmpty(this.application.getVersion()) ? this.global.getApplication().getVersion()
+				: this.application.getVersion();
+		if (isEmpty(applicationVersion)) {
 			throw new MojoExecutionException("The application.version parameter is required!");
 		}
 		app.setVersion(applicationVersion);
 
-		String applicationConfigClass = StringUtils.isEmpty(this.application.getConfigClass()) ?
-				this.global.getApplication().getConfigClass() : this.application.getConfigClass();
-		app.setConfigClass(applicationConfigClass); // TODO is applicationConfigClass a required parameter?
+		String applicationConfigClass = isEmpty(this.application.getConfigClass())
+				? this.global.getApplication().getConfigClass()
+				: this.application.getConfigClass();
+		if (isEmpty(applicationConfigClass)) {
+			throw new MojoExecutionException("The application.configClass parameter is required!");
+		}
+		app.setConfigClass(applicationConfigClass);
 
-		String applicationGroupId = StringUtils.isEmpty(this.application.getGroupId()) ?
-				this.global.getApplication().getGroupId() : this.application.getGroupId();
+		String applicationGroupId = isEmpty(this.application.getGroupId())
+				? this.global.getApplication().getGroupId()
+				: this.application.getGroupId();
 		app.setGroupId(applicationGroupId); // optional parameter
 
-		String applicationFunctionDefinition = StringUtils.isEmpty(this.application.getFunctionDefinition()) ?
-				this.global.getApplication().getFunctionDefinition() : this.application.getFunctionDefinition();
-		app.setFunctionDefinition(applicationFunctionDefinition); //TODO is applicationFunctionDefinition required?
+		String applicationFunctionDefinition = isEmpty(this.application.getFunctionDefinition())
+				? this.global.getApplication().getFunctionDefinition()
+				: this.application.getFunctionDefinition();
+		app.setFunctionDefinition(applicationFunctionDefinition); // TODO is applicationFunctionDefinition required?
 
-		String metadataMavenPluginVersion = StringUtils.isEmpty(this.application.getMetadata().getMavenPluginVersion()) ?
-				this.global.getApplication().getMetadata().getMavenPluginVersion() : this.application.getMetadata().getMavenPluginVersion();
-		if (StringUtils.isEmpty(metadataMavenPluginVersion)) {
+		String metadataMavenPluginVersion = isEmpty(this.application.getMetadata().getMavenPluginVersion())
+				? this.global.getApplication().getMetadata().getMavenPluginVersion()
+				: this.application.getMetadata().getMavenPluginVersion();
+		if (isEmpty(metadataMavenPluginVersion)) {
 			throw new MojoExecutionException("The application.metadata.mavenPluginVersion parameter is required!");
 		}
 		app.getMetadata().setMavenPluginVersion(metadataMavenPluginVersion);
 
-		List<String> allSourceTypeFilters = new ArrayList<>(this.global.getApplication().getMetadata().getSourceTypeFilters());
+		List<String> allSourceTypeFilters = new ArrayList<>(
+				this.global.getApplication().getMetadata().getSourceTypeFilters());
 		allSourceTypeFilters.addAll(this.application.getMetadata().getSourceTypeFilters());
 		List<String> allNamedFilters = new ArrayList<>(this.global.getApplication().getMetadata().getNameFilters());
 		allNamedFilters.addAll(this.application.getMetadata().getNameFilters());
@@ -155,19 +168,20 @@ public class SpringCloudStreamAppGeneratorMojo extends AbstractMojo {
 		Map<String, String> allApplicationProperties = new TreeMap<>(this.global.getApplication().getProperties());
 		allApplicationProperties.putAll(this.application.getProperties());
 		app.setProperties(allApplicationProperties.entrySet().stream()
-				.map(e -> e.getKey() + "=" + (StringUtils.hasText(e.getValue()) ?
-						e.getValue().replaceAll("^\"|\"$", "") : ""))
+				.map(e -> e.getKey() + "="
+						+ (StringUtils.hasText(e.getValue()) ? e.getValue().replaceAll("^\"|\"$", "") : ""))
 				.collect(Collectors.toList()));
 
 		// Maven properties
 		Map<String, String> allMavenProperties = new TreeMap<>(this.global.getApplication().getMaven().getProperties());
 		allMavenProperties.putAll(this.application.getMaven().getProperties());
 		app.getMaven().setProperties(allMavenProperties.entrySet().stream()
-				.map(es -> "<" + es.getKey() + ">" + (StringUtils.hasText(es.getValue()) ?
-						es.getValue().replaceAll("^\"|\"$", "") : "") + "</" + es.getKey() + ">")
+				.map(es -> "<" + es.getKey() + ">"
+						+ (StringUtils.hasText(es.getValue()) ? es.getValue().replaceAll("^\"|\"$", "") : "") + "</"
+						+ es.getKey() + ">")
 				.collect(Collectors.toList()));
 
-		//Maven BOM. For DependencyManagement it is important to retain the exact definition order!
+		// Maven BOM. For DependencyManagement it is important to retain the exact definition order!
 		// Override the global dependencies with matching app dependency definitions. Retain the definition order!
 		List<Dependency> allDeps = this.global.getApplication().getMaven().getDependencyManagement().stream()
 				.map(globalDep -> this.application.getMaven().getDependencyManagement().stream()
@@ -193,10 +207,11 @@ public class SpringCloudStreamAppGeneratorMojo extends AbstractMojo {
 				.map(xml -> MavenXmlWriter.indent(xml, 12))
 				.collect(Collectors.toList()));
 
-		//Maven Dependencies
+		// Maven Dependencies
 		Map<String, Dependency> allDependenciesMap = this.global.getApplication().getMaven().getDependencies().stream()
 				.collect(Collectors.toMap(d -> d.getGroupId() + ":" + d.getArtifactId(), d -> d));
-		// Ensure that for dependencies with same maven coordinates that application definition overrides the global one.
+		// Ensure that for dependencies with same maven coordinates that application definition overrides the global
+		// one.
 		allDependenciesMap.putAll(this.application.getMaven().getDependencies().stream()
 				.collect(Collectors.toMap(d -> d.getGroupId() + ":" + d.getArtifactId(), d -> d)));
 		app.getMaven().setDependencies(allDependenciesMap.values().stream()
@@ -204,7 +219,7 @@ public class SpringCloudStreamAppGeneratorMojo extends AbstractMojo {
 				.map(xml -> MavenXmlWriter.indent(xml, 8))
 				.collect(Collectors.toList()));
 
-		//Maven Plugins
+		// Maven Plugins
 		Map<String, Plugin> allPluginsMap = this.global.getApplication().getMaven().getPlugins().stream()
 				.collect(Collectors.toMap(p -> p.getGroupId() + ":" + p.getArtifactId(), p -> p));
 		// Ensure that for plugins with same maven coordinates that application definition overrides the global one.
@@ -227,9 +242,11 @@ public class SpringCloudStreamAppGeneratorMojo extends AbstractMojo {
 				.collect(Collectors.toList()));
 
 		// Container Image configuration
-		AppDefinition.ContainerImageFormat containerImageFormat = (this.application.getContainerImage().getFormat() != null) ?
-				this.application.getContainerImage().getFormat() : this.global.getApplication().getContainerImage().getFormat();
-		containerImageFormat = (containerImageFormat == null) ? AppDefinition.ContainerImageFormat.Docker : containerImageFormat;
+		AppDefinition.ContainerImageFormat containerImageFormat = (this.application.getContainerImage()
+				.getFormat() != null) ? this.application.getContainerImage().getFormat()
+						: this.global.getApplication().getContainerImage().getFormat();
+		containerImageFormat = (containerImageFormat == null) ? AppDefinition.ContainerImageFormat.Docker
+				: containerImageFormat;
 		app.getContainerImage().setFormat(containerImageFormat);
 
 		// TODO how to choose between global an app metadata enabling?
@@ -255,7 +272,7 @@ public class SpringCloudStreamAppGeneratorMojo extends AbstractMojo {
 		ProjectGeneratorProperties generatorProperties = new ProjectGeneratorProperties();
 
 		// ----------------------------------------------------------------------------------------------------------
-		//                               Binders Configuration
+		// Binders Configuration
 		// ----------------------------------------------------------------------------------------------------------
 
 		Map<String, Binder> allBinders = new HashMap<>(this.global.getBinders());
@@ -309,7 +326,7 @@ public class SpringCloudStreamAppGeneratorMojo extends AbstractMojo {
 		app.setBootPluginConfiguration(this.application.getBootPluginConfiguration());
 
 		// ----------------------------------------------------------------------------------------------------------
-		//                                 Project Generator
+		// Project Generator
 		// ----------------------------------------------------------------------------------------------------------
 
 		generatorProperties.setAppDefinition(app);
@@ -331,18 +348,18 @@ public class SpringCloudStreamAppGeneratorMojo extends AbstractMojo {
 	}
 
 	/**
-	 * If the visible metadata properties files are provided in the source project, add theirs' type and name filters
-	 * to the existing visible configurations.
+	 * If the visible metadata properties files are provided in the source project, add theirs' type and name filters to
+	 * the existing visible configurations.
 	 *
 	 * @param sourceTypeFilters existing source type filters configured via the mojo parameter.
-	 * @param nameFilters       existing name filters configured via the mojo parameter.
+	 * @param nameFilters existing name filters configured via the mojo parameter.
 	 */
 	private void populateVisiblePropertiesFromFile(List<String> sourceTypeFilters, List<String> nameFilters) {
 		if (this.projectResourcesDir == null || !projectResourcesDir.exists()) {
 			return;
 		}
-		Optional<Properties> optionalProperties =
-				loadVisiblePropertiesFromResource(FileUtils.getFile(projectResourcesDir, "META-INF",
+		Optional<Properties> optionalProperties = loadVisiblePropertiesFromResource(
+				FileUtils.getFile(projectResourcesDir, "META-INF",
 						VISIBLE_PROPERTIES_FILE_NAME));
 		optionalProperties.ifPresent(properties -> {
 			addToFilters(properties.getProperty(CONFIGURATION_PROPERTIES_CLASSES), sourceTypeFilters);
@@ -354,12 +371,12 @@ public class SpringCloudStreamAppGeneratorMojo extends AbstractMojo {
 
 		loadVisiblePropertiesFromResource(FileUtils.getFile(
 				projectResourcesDir, "META-INF", DEPRECATED_WHITELIST_FILE_NAME))
-				.ifPresent(properties -> {
-					getLog().warn(DEPRECATED_WHITELIST_FILE_NAME + " is deprecated." +
-							" Please use " + VISIBLE_PROPERTIES_FILE_NAME + " instead");
-					addToFilters(properties.getProperty(CONFIGURATION_PROPERTIES_CLASSES), sourceTypeFilters);
-					addToFilters(properties.getProperty(CONFIGURATION_PROPERTIES_NAMES), nameFilters);
-				});
+						.ifPresent(properties -> {
+							getLog().warn(DEPRECATED_WHITELIST_FILE_NAME + " is deprecated." +
+									" Please use " + VISIBLE_PROPERTIES_FILE_NAME + " instead");
+							addToFilters(properties.getProperty(CONFIGURATION_PROPERTIES_CLASSES), sourceTypeFilters);
+							addToFilters(properties.getProperty(CONFIGURATION_PROPERTIES_NAMES), nameFilters);
+						});
 	}
 
 	private Optional<Properties> loadVisiblePropertiesFromResource(File visiblePropertiesFile) {
@@ -378,7 +395,7 @@ public class SpringCloudStreamAppGeneratorMojo extends AbstractMojo {
 	}
 
 	private void addToFilters(String csvFilterProperties, List<String> filterList) {
-		if (!StringUtils.isEmpty(csvFilterProperties)) {
+		if (!isEmpty(csvFilterProperties)) {
 			for (String filterProperty : csvFilterProperties.trim().split(",")) {
 				if (StringUtils.hasText(filterProperty)) {
 					if (!filterList.contains(filterProperty.trim())) {
@@ -390,8 +407,8 @@ public class SpringCloudStreamAppGeneratorMojo extends AbstractMojo {
 	}
 
 	/**
-	 * Section that allow to define Application and Binder configurations common across multiple applications
-	 * and binders.
+	 * Section that allow to define Application and Binder configurations common across multiple applications and
+	 * binders.
 	 */
 	public static class Global {
 
@@ -414,9 +431,8 @@ public class SpringCloudStreamAppGeneratorMojo extends AbstractMojo {
 	public static class Application {
 
 		/**
-		 * Unique name of the application for the given type.
-		 * The generated binder specific, applications have names that combine this application name, type as well
-		 * as the name of the binder they are produced for.
+		 * Unique name of the application for the given type. The generated binder specific, applications have names
+		 * that combine this application name, type as well as the name of the binder they are produced for.
 		 */
 		private String name;
 
@@ -543,8 +559,8 @@ public class SpringCloudStreamAppGeneratorMojo extends AbstractMojo {
 		}
 
 		public String getFunctionDefinition() {
-			return (!StringUtils.isEmpty(this.functionDefinition)) ? this.functionDefinition :
-					this.name + this.functionType();
+			return (!isEmpty(this.functionDefinition)) ? this.functionDefinition
+					: this.name + this.functionType();
 		}
 
 		public void setFunctionDefinition(String functionDefinition) {
@@ -687,7 +703,6 @@ public class SpringCloudStreamAppGeneratorMojo extends AbstractMojo {
 		 */
 		private final Maven maven = new Maven();
 
-
 		public Maven getMaven() {
 			return maven;
 		}
@@ -725,9 +740,14 @@ public class SpringCloudStreamAppGeneratorMojo extends AbstractMojo {
 		 * Custom maven plugins. Contributed to the generated POM's plugins section.
 		 *
 		 * Note: if the plugin definition uses a configuration block then the content must be wrapped within a
-		 * <pre>@code{
+		 *
+		 * <pre>
+		 * &#64;code{
 		 * <![CDATA[ ... ]]>
-		 * }</pre> section! Find more: {@link MavenXmlWriter#toXml(Plugin)}.
+		 * }
+		 * </pre>
+		 *
+		 * section! Find more: {@link MavenXmlWriter#toXml(Plugin)}.
 		 */
 		private List<Plugin> plugins = new ArrayList<>();
 
